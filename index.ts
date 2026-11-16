@@ -157,9 +157,57 @@ console.log('Свадебный бот запущен!');
 
 
 const PORT = process.env.PORT || 3000;
+
 http.createServer((req, res) => {
+    // Настройка CORS, чтобы сайт с Vercel мог отправлять запросы на Render
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    // Обработка предварительного запроса браузера
+    if (req.method === 'OPTIONS') {
+        res.writeHead(204);
+        res.end();
+        return;
+    }
+
+    // Эндпоинт для приема уведомлений с сайта
+    if (req.method === 'POST' && req.url === '/notify') {
+        let body = '';
+        req.on('data', (chunk) => {
+            body += chunk.toString();
+        });
+
+        req.on('end', async () => {
+            try {
+                const data = JSON.parse(body);
+                const text = `
+🔔 *Новый ответ на приглашение!*
+
+👤 *Гость:* ${data.name}
+📍 *Статус:* ${data.attending}
+🍷 *Напитки:* ${data.alcohol}
+🚌 *Трансфер:* ${data.transport}
+        `.trim();
+
+                // Рассылаем уведомление жениху и невесте
+                for (const chatId of ALLOWED_USERS) {
+                    await bot.telegram.sendMessage(chatId, text, { parse_mode: 'Markdown' });
+                }
+
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ ok: true }));
+            } catch {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ ok: false }));
+            }
+        });
+        return;
+    }
+
+    // Стандартный ответ для UptimeRobot
     res.writeHead(200, { 'Content-Type': 'text/plain' });
     res.end('Wedding bot is running!');
 }).listen(PORT, () => {
-    console.log(`HTTP сервер слушает порт ${PORT}`);
+    console.log(`Сервер запущен на порту ${PORT}`);
 });
