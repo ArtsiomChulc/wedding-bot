@@ -1,6 +1,7 @@
 import { Telegraf, Markup, session } from 'telegraf';
 import { message } from 'telegraf/filters';
 import * as dotenv from 'dotenv';
+import * as http from 'http';
 
 dotenv.config();
 
@@ -153,3 +154,12 @@ bot.on(message('text'), async (ctx) => {
 
 bot.launch();
 console.log('Свадебный бот запущен!');
+
+
+const PORT = process.env.PORT || 3000;
+http.createServer((req, res) => {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('Wedding bot is running!');
+}).listen(PORT, () => {
+    console.log(`HTTP сервер слушает порт ${PORT}`);
+});
