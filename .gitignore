@@ -1,0 +1,39 @@
+# ОС и системные файлы
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Логи и временные файлы
+*.log
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Среды разработки и IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.suo
+*.nx*
+
+# Зависимости и пакеты
+node_modules/
+vendor/
+packages/
+venv/
+env/
+.env.local
+
+# Артефакты сборки
+dist/
+build/
+out/
+target/
+*.apk
+*.exe
+*.dll
+*.so
+*.dylib
